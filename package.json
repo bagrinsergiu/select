@@ -48,8 +48,8 @@
     "rc-motion": "^2.0.1",
     "rc-trigger": "^5.0.4",
     "rc-util": "^5.0.1",
-    "rc-virtual-list": "^3.0.3",
-    "warning": "^4.0.3"
+    "warning": "^4.0.3",
+    "rc-virtual-list": "github:bagrinsergiu/virtual-list#remove_builded_folders_from_git_ignore_to_can_install_fork_locally"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.5",
