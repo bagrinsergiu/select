@@ -20,16 +20,13 @@ Thumbs.db
 .build
 node_modules
 .cache
-dist
 debug.tsx
 debug.md
 assets/**/*.css
 build
-lib
 coverage
 .vscode
 yarn.lock
-es/
 package-lock.json
 src/*.js
 src/*.map

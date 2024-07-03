@@ -51,7 +51,7 @@
     "rc-motion": "^2.0.1",
     "rc-overflow": "^1.3.1",
     "rc-util": "^5.16.1",
-    "rc-virtual-list": "^3.5.2"
+    "rc-virtual-list": "github:bagrinsergiu/virtual-list#remove_builded_folders_from_git_ignore_to_can_install_fork_locally"
   },
   "devDependencies": {
     "@rc-component/father-plugin": "^1.0.2",
