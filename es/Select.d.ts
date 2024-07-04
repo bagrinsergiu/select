@@ -29,90 +29,22 @@
  * - `combobox` mode not support `optionLabelProp`
  */
 import * as React from 'react';
-import type { BaseSelectPropsWithoutPrivate, BaseSelectRef, DisplayValueType, RenderNode } from './BaseSelect';
-import OptGroup from './OptGroup';
+import { OptionsType as SelectOptionsType } from './interface';
 import Option from './Option';
-import type { FlattenOptionData } from './interface';
-export type OnActiveValue = (active: RawValueType, index: number, info?: {
-    source?: 'keyboard' | 'mouse';
-}) => void;
-export type OnInternalSelect = (value: RawValueType, info: {
-    selected: boolean;
-}) => void;
-export type RawValueType = string | number;
-export interface LabelInValueType {
-    label: React.ReactNode;
-    value: RawValueType;
-    /** @deprecated `key` is useless since it should always same as `value` */
-    key?: React.Key;
+import OptGroup from './OptGroup';
+import { SelectProps, RefSelectProps } from './generate';
+import { DefaultValueType } from './interface/generator';
+export declare type ExportedSelectProps<ValueType extends DefaultValueType = DefaultValueType> = SelectProps<SelectOptionsType, ValueType>;
+/**
+ * Typescript not support generic with function component,
+ * we have to wrap an class component to handle this.
+ */
+declare class Select<VT> extends React.Component<SelectProps<SelectOptionsType, VT>> {
+    static Option: typeof Option;
+    static OptGroup: typeof OptGroup;
+    selectRef: React.RefObject<RefSelectProps>;
+    focus: () => void;
+    blur: () => void;
+    render(): React.JSX.Element;
 }
-export type DraftValueType = RawValueType | LabelInValueType | DisplayValueType | (RawValueType | LabelInValueType | DisplayValueType)[];
-export type FilterFunc<OptionType> = (inputValue: string, option?: OptionType) => boolean;
-export interface FieldNames {
-    value?: string;
-    label?: string;
-    groupLabel?: string;
-    options?: string;
-}
-export interface BaseOptionType {
-    disabled?: boolean;
-    className?: string;
-    title?: string;
-    [name: string]: any;
-}
-export interface DefaultOptionType extends BaseOptionType {
-    label?: React.ReactNode;
-    value?: string | number | null;
-    children?: Omit<DefaultOptionType, 'children'>[];
-}
-export type SelectHandler<ValueType, OptionType extends BaseOptionType = DefaultOptionType> = (value: ValueType, option: OptionType) => void;
-type ArrayElementType<T> = T extends (infer E)[] ? E : T;
-export interface SelectProps<ValueType = any, OptionType extends BaseOptionType = DefaultOptionType> extends BaseSelectPropsWithoutPrivate {
-    prefixCls?: string;
-    id?: string;
-    backfill?: boolean;
-    fieldNames?: FieldNames;
-    /** @deprecated Use `searchValue` instead */
-    inputValue?: string;
-    searchValue?: string;
-    onSearch?: (value: string) => void;
-    autoClearSearchValue?: boolean;
-    onSelect?: SelectHandler<ArrayElementType<ValueType>, OptionType>;
-    onDeselect?: SelectHandler<ArrayElementType<ValueType>, OptionType>;
-    /**
-     * In Select, `false` means do nothing.
-     * In TreeSelect, `false` will highlight match item.
-     * It's by design.
-     */
-    filterOption?: boolean | FilterFunc<OptionType>;
-    filterSort?: (optionA: OptionType, optionB: OptionType, info: {
-        searchValue: string;
-    }) => number;
-    optionFilterProp?: string;
-    optionLabelProp?: string;
-    children?: React.ReactNode;
-    options?: OptionType[];
-    optionRender?: (oriOption: FlattenOptionData<OptionType>, info: {
-        index: number;
-    }) => React.ReactNode;
-    defaultActiveFirstOption?: boolean;
-    virtual?: boolean;
-    direction?: 'ltr' | 'rtl';
-    listHeight?: number;
-    listItemHeight?: number;
-    labelRender?: (props: LabelInValueType) => React.ReactNode;
-    menuItemSelectedIcon?: RenderNode;
-    mode?: 'combobox' | 'multiple' | 'tags';
-    labelInValue?: boolean;
-    value?: ValueType | null;
-    defaultValue?: ValueType | null;
-    maxCount?: number;
-    onChange?: (value: ValueType, option: OptionType | OptionType[]) => void;
-}
-declare const TypedSelect: (<ValueType = any, OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType>(props: SelectProps<ValueType, OptionType> & {
-    children?: React.ReactNode;
-} & React.RefAttributes<BaseSelectRef>) => React.ReactElement) & {
-    Option: typeof Option;
-    OptGroup: typeof OptGroup;
-};
-export default TypedSelect;
+export default Select;

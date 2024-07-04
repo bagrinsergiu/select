@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 /**
  * Locker return cached mark.
  * If set to `true`, will return `true` in a short time even if set `false`.
@@ -10,7 +9,6 @@ export default function useLock() {
   var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 250;
   var lockRef = React.useRef(null);
   var timeoutRef = React.useRef(null);
-
   // Clean up
   React.useEffect(function () {
     return function () {

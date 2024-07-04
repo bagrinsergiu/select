@@ -1,5 +1,5 @@
 import * as React from 'react';
-type InputRef = HTMLInputElement | HTMLTextAreaElement;
+declare type InputRef = HTMLInputElement | HTMLTextAreaElement;
 interface InputProps {
     prefixCls: string;
     id: string;
@@ -8,13 +8,12 @@ interface InputProps {
     autoFocus: boolean;
     autoComplete: string;
     editable: boolean;
-    activeDescendantId?: string;
+    accessibilityIndex: number;
     value: string;
-    maxLength?: number;
     open: boolean;
     tabIndex: number;
     /** Pass accessibility props to input */
-    attrs: Record<string, unknown>;
+    attrs: object;
     onKeyDown: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement | HTMLElement>;
     onMouseDown: React.MouseEventHandler<HTMLInputElement | HTMLTextAreaElement | HTMLElement>;
     onChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement | HTMLElement>;

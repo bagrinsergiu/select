@@ -1,6 +1,5 @@
-import type { AlignType, BuildInPlacements } from '@rc-component/trigger/lib/interface';
 import * as React from 'react';
-import type { Placement, RenderDOMFunc } from './BaseSelect';
+import { RenderDOMFunc } from './interface';
 export interface RefTriggerProps {
     getPopupElement: () => HTMLDivElement;
 }
@@ -12,19 +11,16 @@ export interface SelectTriggerProps {
     popupElement: React.ReactElement;
     animation?: string;
     transitionName?: string;
-    placement?: Placement;
-    builtinPlacements?: BuildInPlacements;
+    containerWidth: number;
     dropdownStyle: React.CSSProperties;
     dropdownClassName: string;
     direction: string;
     dropdownMatchSelectWidth?: boolean | number;
     dropdownRender?: (menu: React.ReactElement) => React.ReactElement;
     getPopupContainer?: RenderDOMFunc;
-    dropdownAlign: AlignType;
+    dropdownAlign: object;
     empty: boolean;
-    getTriggerDOMNode: (node: HTMLElement) => HTMLElement;
-    onPopupVisibleChange?: (visible: boolean) => void;
-    onPopupMouseEnter: () => void;
+    getTriggerDOMNode: () => HTMLElement;
 }
 declare const RefSelectTrigger: React.ForwardRefExoticComponent<SelectTriggerProps & React.RefAttributes<RefTriggerProps>>;
 export default RefSelectTrigger;

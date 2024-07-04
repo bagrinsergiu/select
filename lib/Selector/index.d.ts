@@ -7,27 +7,24 @@
  * Accessibility:
  * - https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.1pattern/listbox-combo.html
  */
-import type { ScrollTo } from 'rc-virtual-list/lib/List';
 import * as React from 'react';
-import type { CustomTagProps, DisplayValueType, Mode, RenderNode } from '../BaseSelect';
+import { LabelValueType, RawValueType, CustomTagProps } from '../interface/generator';
+import { RenderNode, Mode } from '../interface';
 export interface InnerSelectorProps {
     prefixCls: string;
     id: string;
     mode: Mode;
-    title?: string;
     inputRef: React.Ref<HTMLInputElement | HTMLTextAreaElement>;
     placeholder?: React.ReactNode;
     disabled?: boolean;
     autoFocus?: boolean;
     autoComplete?: string;
-    values: DisplayValueType[];
+    values: LabelValueType[];
     showSearch?: boolean;
     searchValue: string;
-    autoClearSearchValue?: boolean;
-    activeDescendantId?: string;
+    accessibilityIndex: number;
     open: boolean;
     tabIndex?: number;
-    maxLength?: number;
     onInputKeyDown: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>;
     onInputMouseDown: React.MouseEventHandler<HTMLInputElement | HTMLTextAreaElement>;
     onInputChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
@@ -36,9 +33,8 @@ export interface InnerSelectorProps {
     onInputCompositionEnd: React.CompositionEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 }
 export interface RefSelectorProps {
-    focus: (options?: FocusOptions) => void;
+    focus: () => void;
     blur: () => void;
-    scrollTo?: ScrollTo;
 }
 export interface SelectorProps {
     id: string;
@@ -46,22 +42,21 @@ export interface SelectorProps {
     showSearch?: boolean;
     open: boolean;
     /** Display in the Selector value, it's not same as `value` prop */
-    values: DisplayValueType[];
+    values: LabelValueType[];
+    multiple: boolean;
     mode: Mode;
     searchValue: string;
     activeValue: string;
-    autoClearSearchValue: boolean;
     inputElement: JSX.Element;
-    maxLength?: number;
     autoFocus?: boolean;
-    activeDescendantId?: string;
+    accessibilityIndex: number;
     tabIndex?: number;
     disabled?: boolean;
     placeholder?: React.ReactNode;
     removeIcon?: RenderNode;
-    maxTagCount?: number | 'responsive';
+    maxTagCount?: number;
     maxTagTextLength?: number;
-    maxTagPlaceholder?: React.ReactNode | ((omittedValues: DisplayValueType[]) => React.ReactNode);
+    maxTagPlaceholder?: React.ReactNode | ((omittedValues: LabelValueType[]) => React.ReactNode);
     tagRender?: (props: CustomTagProps) => React.ReactElement;
     /** Check if `tokenSeparators` contains `\n` or `\r\n` */
     tokenWithEnter?: boolean;
@@ -69,8 +64,10 @@ export interface SelectorProps {
     onToggleOpen: (open?: boolean) => void;
     /** `onSearch` returns go next step boolean to check if need do toggle open */
     onSearch: (searchText: string, fromTyping: boolean, isCompositing: boolean) => boolean;
-    onSearchSubmit?: (searchText: string) => void;
-    onRemove: (value: DisplayValueType) => void;
+    onSearchSubmit: (searchText: string) => void;
+    onSelect: (value: RawValueType, option: {
+        selected: boolean;
+    }) => void;
     onInputKeyDown?: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>;
     /**
      * @private get real dom for trigger align.

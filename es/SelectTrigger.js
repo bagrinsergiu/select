@@ -1,14 +1,14 @@
-import _extends from "@babel/runtime/helpers/esm/extends";
 import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
 import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
 import _objectWithoutProperties from "@babel/runtime/helpers/esm/objectWithoutProperties";
-var _excluded = ["prefixCls", "disabled", "visible", "children", "popupElement", "animation", "transitionName", "dropdownStyle", "dropdownClassName", "direction", "placement", "builtinPlacements", "dropdownMatchSelectWidth", "dropdownRender", "dropdownAlign", "getPopupContainer", "empty", "getTriggerDOMNode", "onPopupVisibleChange", "onPopupMouseEnter"];
-import Trigger from '@rc-component/trigger';
-import classNames from 'classnames';
+var _excluded = ["prefixCls", "disabled", "visible", "children", "popupElement", "containerWidth", "animation", "transitionName", "dropdownStyle", "dropdownClassName", "direction", "dropdownMatchSelectWidth", "dropdownRender", "dropdownAlign", "getPopupContainer", "empty", "getTriggerDOMNode"];
+/* eslint-disable */
 import * as React from 'react';
+import Trigger from 'rc-trigger';
+import classNames from 'classnames';
 var getBuiltInPlacements = function getBuiltInPlacements(dropdownMatchSelectWidth) {
   // Enable horizontal overflow auto-adjustment when a custom dropdown width is provided
-  var adjustX = dropdownMatchSelectWidth === true ? 0 : 1;
+  var adjustX = typeof dropdownMatchSelectWidth !== 'number' ? 0 : 1;
   return {
     bottomLeft: {
       points: ['tl', 'bl'],
@@ -16,8 +16,7 @@ var getBuiltInPlacements = function getBuiltInPlacements(dropdownMatchSelectWidt
       overflow: {
         adjustX: adjustX,
         adjustY: 1
-      },
-      htmlRegion: 'scroll'
+      }
     },
     bottomRight: {
       points: ['tr', 'br'],
@@ -25,8 +24,7 @@ var getBuiltInPlacements = function getBuiltInPlacements(dropdownMatchSelectWidt
       overflow: {
         adjustX: adjustX,
         adjustY: 1
-      },
-      htmlRegion: 'scroll'
+      }
     },
     topLeft: {
       points: ['bl', 'tl'],
@@ -34,8 +32,7 @@ var getBuiltInPlacements = function getBuiltInPlacements(dropdownMatchSelectWidt
       overflow: {
         adjustX: adjustX,
         adjustY: 1
-      },
-      htmlRegion: 'scroll'
+      }
     },
     topRight: {
       points: ['br', 'tr'],
@@ -43,8 +40,7 @@ var getBuiltInPlacements = function getBuiltInPlacements(dropdownMatchSelectWidt
       overflow: {
         adjustX: adjustX,
         adjustY: 1
-      },
-      htmlRegion: 'scroll'
+      }
     }
   };
 };
@@ -54,83 +50,71 @@ var SelectTrigger = function SelectTrigger(props, ref) {
     visible = props.visible,
     children = props.children,
     popupElement = props.popupElement,
+    containerWidth = props.containerWidth,
     animation = props.animation,
     transitionName = props.transitionName,
     dropdownStyle = props.dropdownStyle,
     dropdownClassName = props.dropdownClassName,
     _props$direction = props.direction,
     direction = _props$direction === void 0 ? 'ltr' : _props$direction,
-    placement = props.placement,
-    builtinPlacements = props.builtinPlacements,
-    dropdownMatchSelectWidth = props.dropdownMatchSelectWidth,
+    _props$dropdownMatchS = props.dropdownMatchSelectWidth,
+    dropdownMatchSelectWidth = _props$dropdownMatchS === void 0 ? true : _props$dropdownMatchS,
     dropdownRender = props.dropdownRender,
     dropdownAlign = props.dropdownAlign,
     getPopupContainer = props.getPopupContainer,
     empty = props.empty,
     getTriggerDOMNode = props.getTriggerDOMNode,
-    onPopupVisibleChange = props.onPopupVisibleChange,
-    onPopupMouseEnter = props.onPopupMouseEnter,
     restProps = _objectWithoutProperties(props, _excluded);
   var dropdownPrefixCls = "".concat(prefixCls, "-dropdown");
   var popupNode = popupElement;
   if (dropdownRender) {
     popupNode = dropdownRender(popupElement);
   }
-  var mergedBuiltinPlacements = React.useMemo(function () {
-    return builtinPlacements || getBuiltInPlacements(dropdownMatchSelectWidth);
-  }, [builtinPlacements, dropdownMatchSelectWidth]);
-
+  var builtInPlacements = React.useMemo(function () {
+    return getBuiltInPlacements(dropdownMatchSelectWidth);
+  }, [dropdownMatchSelectWidth]);
   // ===================== Motion ======================
   var mergedTransitionName = animation ? "".concat(dropdownPrefixCls, "-").concat(animation) : transitionName;
-
-  // =================== Popup Width ===================
-  var isNumberPopupWidth = typeof dropdownMatchSelectWidth === 'number';
-  var stretch = React.useMemo(function () {
-    if (isNumberPopupWidth) {
-      return null;
-    }
-    return dropdownMatchSelectWidth === false ? 'minWidth' : 'width';
-  }, [dropdownMatchSelectWidth, isNumberPopupWidth]);
-  var popupStyle = dropdownStyle;
-  if (isNumberPopupWidth) {
-    popupStyle = _objectSpread(_objectSpread({}, popupStyle), {}, {
-      width: dropdownMatchSelectWidth
-    });
-  }
-
   // ======================= Ref =======================
-  var triggerPopupRef = React.useRef(null);
+  var popupRef = React.useRef(null);
   React.useImperativeHandle(ref, function () {
     return {
+      // @ts-ignore
       getPopupElement: function getPopupElement() {
-        var _triggerPopupRef$curr;
-        return (_triggerPopupRef$curr = triggerPopupRef.current) === null || _triggerPopupRef$curr === void 0 ? void 0 : _triggerPopupRef$curr.popupElement;
+        return popupRef.current;
       }
     };
   });
-  return /*#__PURE__*/React.createElement(Trigger, _extends({}, restProps, {
-    showAction: onPopupVisibleChange ? ['click'] : [],
-    hideAction: onPopupVisibleChange ? ['click'] : [],
-    popupPlacement: placement || (direction === 'rtl' ? 'bottomRight' : 'bottomLeft'),
-    builtinPlacements: mergedBuiltinPlacements,
-    prefixCls: dropdownPrefixCls,
-    popupTransitionName: mergedTransitionName,
-    popup: /*#__PURE__*/React.createElement("div", {
-      onMouseEnter: onPopupMouseEnter
-    }, popupNode),
-    ref: triggerPopupRef,
-    stretch: stretch,
-    popupAlign: dropdownAlign,
-    popupVisible: visible,
-    getPopupContainer: getPopupContainer,
-    popupClassName: classNames(dropdownClassName, _defineProperty({}, "".concat(dropdownPrefixCls, "-empty"), empty)),
-    popupStyle: popupStyle,
-    getTriggerDOMNode: getTriggerDOMNode,
-    onPopupVisibleChange: onPopupVisibleChange
-  }), children);
+  var popupStyle = _objectSpread({
+    minWidth: containerWidth
+  }, dropdownStyle);
+  if (typeof dropdownMatchSelectWidth === 'number') {
+    popupStyle.width = dropdownMatchSelectWidth;
+  } else if (dropdownMatchSelectWidth) {
+    popupStyle.width = containerWidth;
+  }
+  return (
+    /*#__PURE__*/
+    // @ts-ignore
+    React.createElement(Trigger, Object.assign({}, restProps, {
+      showAction: [],
+      hideAction: [],
+      popupPlacement: direction === 'rtl' ? 'bottomRight' : 'bottomLeft',
+      builtinPlacements: builtInPlacements,
+      prefixCls: dropdownPrefixCls,
+      popupTransitionName: mergedTransitionName,
+      popup: /*#__PURE__*/React.createElement("div", {
+        ref: popupRef
+      }, popupNode),
+      popupAlign: dropdownAlign,
+      popupVisible: visible,
+      getPopupContainer: getPopupContainer,
+      popupClassName: classNames(dropdownClassName, _defineProperty({}, "".concat(dropdownPrefixCls, "-empty"), empty)),
+      popupStyle: popupStyle,
+      getTriggerDOMNode: getTriggerDOMNode
+    }), children)
+  );
 };
 var RefSelectTrigger = /*#__PURE__*/React.forwardRef(SelectTrigger);
-if (process.env.NODE_ENV !== 'production') {
-  RefSelectTrigger.displayName = 'SelectTrigger';
-}
+RefSelectTrigger.displayName = 'SelectTrigger';
 export default RefSelectTrigger;

@@ -5,12 +5,11 @@ var _excluded = ["children", "value"],
 import * as React from 'react';
 import toArray from "rc-util/es/Children/toArray";
 function convertNodeToOption(node) {
-  var _ref = node,
-    key = _ref.key,
-    _ref$props = _ref.props,
-    children = _ref$props.children,
-    value = _ref$props.value,
-    restProps = _objectWithoutProperties(_ref$props, _excluded);
+  var key = node.key,
+    _node$props = node.props,
+    children = _node$props.children,
+    value = _node$props.value,
+    restProps = _objectWithoutProperties(_node$props, _excluded);
   return _objectSpread({
     key: key,
     value: value !== undefined ? value : key,
@@ -23,12 +22,11 @@ export function convertChildrenToData(nodes) {
     if (! /*#__PURE__*/React.isValidElement(node) || !node.type) {
       return null;
     }
-    var _ref2 = node,
-      isSelectOptGroup = _ref2.type.isSelectOptGroup,
-      key = _ref2.key,
-      _ref2$props = _ref2.props,
-      children = _ref2$props.children,
-      restProps = _objectWithoutProperties(_ref2$props, _excluded2);
+    var isSelectOptGroup = node.type.isSelectOptGroup,
+      key = node.key,
+      _node$props2 = node.props,
+      children = _node$props2.children,
+      restProps = _objectWithoutProperties(_node$props2, _excluded2);
     if (optionOnly || !isSelectOptGroup) {
       return convertNodeToOption(node);
     }

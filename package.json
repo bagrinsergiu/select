@@ -1,6 +1,6 @@
 {
   "name": "rc-select",
-  "version": "11.4.1",
+  "version": "11.4.1-lfr",
   "description": "React Select",
   "engines": {
     "node": ">=8.x"
@@ -23,7 +23,7 @@
   "homepage": "http://github.com/react-component/select",
   "repository": {
     "type": "git",
-    "url": "git@github.com:react-component/select.git"
+    "url": "git@github.com:bagrinsergiu/select.git"
   },
   "bugs": {
     "url": "http://github.com/react-component/select/issues"
@@ -57,6 +57,8 @@
     "@types/react": "^16.8.19",
     "@types/react-dom": "^16.8.4",
     "@types/warning": "^3.0.0",
+    "@types/node": "11.15.0",
+    "@types/babel__traverse": "7.14.2",
     "cross-env": "^7.0.0",
     "enzyme": "^3.3.0",
     "enzyme-to-json": "^3.4.0",

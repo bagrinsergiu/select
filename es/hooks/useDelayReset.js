@@ -1,6 +1,5 @@
 import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
 import * as React from 'react';
-
 /**
  * Similar with `useLock`, but this hook will always execute last value.
  * When set to `true`, it will keep `true` for a short time even if `false` is set.

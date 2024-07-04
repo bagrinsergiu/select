@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as React from 'react';
 import Trigger from 'rc-trigger';
 import classNames from 'classnames';
@@ -101,9 +102,10 @@ const SelectTrigger: React.RefForwardingComponent<RefTriggerProps, SelectTrigger
     popupNode = dropdownRender(popupElement);
   }
 
-  const builtInPlacements = React.useMemo(() => getBuiltInPlacements(dropdownMatchSelectWidth), [
-    dropdownMatchSelectWidth,
-  ]);
+  const builtInPlacements = React.useMemo(
+    () => getBuiltInPlacements(dropdownMatchSelectWidth),
+    [dropdownMatchSelectWidth],
+  );
 
   // ===================== Motion ======================
   const mergedTransitionName = animation ? `${dropdownPrefixCls}-${animation}` : transitionName;
@@ -112,6 +114,7 @@ const SelectTrigger: React.RefForwardingComponent<RefTriggerProps, SelectTrigger
   const popupRef = React.useRef<HTMLDivElement>(null);
 
   React.useImperativeHandle(ref, () => ({
+    // @ts-ignore
     getPopupElement: () => popupRef.current,
   }));
 
@@ -127,6 +130,7 @@ const SelectTrigger: React.RefForwardingComponent<RefTriggerProps, SelectTrigger
   }
 
   return (
+    // @ts-ignore
     <Trigger
       {...restProps}
       showAction={[]}

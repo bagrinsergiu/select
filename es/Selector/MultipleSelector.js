@@ -1,29 +1,22 @@
 import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
+import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
+import _objectWithoutProperties from "@babel/runtime/helpers/esm/objectWithoutProperties";
 import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
+var _excluded = ["label"];
 import * as React from 'react';
-import { useState } from 'react';
 import classNames from 'classnames';
 import pickAttrs from "rc-util/es/pickAttrs";
-import Overflow from 'rc-overflow';
-import TransBtn from "../TransBtn";
-import Input from "./Input";
-import useLayoutEffect from "../hooks/useLayoutEffect";
-import { getTitle } from "../utils/commonUtil";
-function itemKey(value) {
-  var _value$key;
-  return (_value$key = value.key) !== null && _value$key !== void 0 ? _value$key : value.value;
-}
-var onPreventMouseDown = function onPreventMouseDown(event) {
-  event.preventDefault();
-  event.stopPropagation();
-};
+import { CSSMotionList } from 'rc-motion';
+import TransBtn from '../TransBtn';
+import Input from './Input';
+import useLayoutEffect from '../hooks/useLayoutEffect';
+var REST_TAG_KEY = '__RC_SELECT_MAX_REST_COUNT__';
 var SelectSelector = function SelectSelector(props) {
   var id = props.id,
     prefixCls = props.prefixCls,
     values = props.values,
     open = props.open,
     searchValue = props.searchValue,
-    autoClearSearchValue = props.autoClearSearchValue,
     inputRef = props.inputRef,
     placeholder = props.placeholder,
     disabled = props.disabled,
@@ -31,9 +24,10 @@ var SelectSelector = function SelectSelector(props) {
     showSearch = props.showSearch,
     autoFocus = props.autoFocus,
     autoComplete = props.autoComplete,
-    activeDescendantId = props.activeDescendantId,
+    accessibilityIndex = props.accessibilityIndex,
     tabIndex = props.tabIndex,
     removeIcon = props.removeIcon,
+    choiceTransitionName = props.choiceTransitionName,
     maxTagCount = props.maxTagCount,
     maxTagTextLength = props.maxTagTextLength,
     _props$maxTagPlacehol = props.maxTagPlaceholder,
@@ -41,105 +35,117 @@ var SelectSelector = function SelectSelector(props) {
       return "+ ".concat(omittedValues.length, " ...");
     } : _props$maxTagPlacehol,
     tagRender = props.tagRender,
-    onToggleOpen = props.onToggleOpen,
-    onRemove = props.onRemove,
+    onSelect = props.onSelect,
     onInputChange = props.onInputChange,
     onInputPaste = props.onInputPaste,
     onInputKeyDown = props.onInputKeyDown,
     onInputMouseDown = props.onInputMouseDown,
     onInputCompositionStart = props.onInputCompositionStart,
     onInputCompositionEnd = props.onInputCompositionEnd;
+  var _React$useState = React.useState(false),
+    _React$useState2 = _slicedToArray(_React$useState, 2),
+    motionAppear = _React$useState2[0],
+    setMotionAppear = _React$useState2[1];
   var measureRef = React.useRef(null);
-  var _useState = useState(0),
-    _useState2 = _slicedToArray(_useState, 2),
-    inputWidth = _useState2[0],
-    setInputWidth = _useState2[1];
-  var _useState3 = useState(false),
-    _useState4 = _slicedToArray(_useState3, 2),
-    focused = _useState4[0],
-    setFocused = _useState4[1];
-  var selectionPrefixCls = "".concat(prefixCls, "-selection");
-
+  var _React$useState3 = React.useState(0),
+    _React$useState4 = _slicedToArray(_React$useState3, 2),
+    inputWidth = _React$useState4[0],
+    setInputWidth = _React$useState4[1];
+  // ===================== Motion ======================
+  React.useEffect(function () {
+    setMotionAppear(true);
+  }, []);
   // ===================== Search ======================
-  var inputValue = open || mode === 'multiple' && autoClearSearchValue === false || mode === 'tags' ? searchValue : '';
-  var inputEditable = mode === 'tags' || mode === 'multiple' && autoClearSearchValue === false || showSearch && (open || focused);
-
+  var inputValue = open || mode === 'tags' ? searchValue : '';
+  var inputEditable = mode === 'tags' || open && showSearch;
   // We measure width and set to the input immediately
   useLayoutEffect(function () {
     setInputWidth(measureRef.current.scrollWidth);
   }, [inputValue]);
-
-  // ===================== Render ======================
-  // >>> Render Selector Node. Includes Item & Rest
-  var defaultRenderSelector = function defaultRenderSelector(item, content, itemDisabled, closable, onClose) {
-    return /*#__PURE__*/React.createElement("span", {
-      title: getTitle(item),
-      className: classNames("".concat(selectionPrefixCls, "-item"), _defineProperty({}, "".concat(selectionPrefixCls, "-item-disabled"), itemDisabled))
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "".concat(selectionPrefixCls, "-item-content")
-    }, content), closable && /*#__PURE__*/React.createElement(TransBtn, {
-      className: "".concat(selectionPrefixCls, "-item-remove"),
-      onMouseDown: onPreventMouseDown,
-      onClick: onClose,
-      customizeIcon: removeIcon
-    }, "\xD7"));
-  };
-  var customizeRenderSelector = function customizeRenderSelector(value, content, itemDisabled, closable, onClose, isMaxTag) {
-    var onMouseDown = function onMouseDown(e) {
-      onPreventMouseDown(e);
-      onToggleOpen(!open);
-    };
-    return /*#__PURE__*/React.createElement("span", {
-      onMouseDown: onMouseDown
-    }, tagRender({
-      label: content,
-      value: value,
-      disabled: itemDisabled,
-      closable: closable,
-      onClose: onClose,
-      isMaxTag: !!isMaxTag
-    }));
-  };
-  var renderItem = function renderItem(valueItem) {
-    var itemDisabled = valueItem.disabled,
-      label = valueItem.label,
-      value = valueItem.value;
-    var closable = !disabled && !itemDisabled;
-    var displayLabel = label;
-    if (typeof maxTagTextLength === 'number') {
+  // ==================== Selection ====================
+  var displayValues = values;
+  // Cut by `maxTagCount`
+  var restCount;
+  if (typeof maxTagCount === 'number') {
+    restCount = values.length - maxTagCount;
+    displayValues = values.slice(0, maxTagCount);
+  }
+  // Update by `maxTagTextLength`
+  if (typeof maxTagTextLength === 'number') {
+    displayValues = displayValues.map(function (_ref) {
+      var label = _ref.label,
+        rest = _objectWithoutProperties(_ref, _excluded);
+      var displayLabel = label;
       if (typeof label === 'string' || typeof label === 'number') {
         var strLabel = String(displayLabel);
         if (strLabel.length > maxTagTextLength) {
           displayLabel = "".concat(strLabel.slice(0, maxTagTextLength), "...");
         }
       }
-    }
-    var onClose = function onClose(event) {
-      if (event) {
-        event.stopPropagation();
-      }
-      onRemove(valueItem);
+      return _objectSpread(_objectSpread({}, rest), {}, {
+        label: displayLabel
+      });
+    });
+  }
+  // Fill rest
+  if (restCount > 0) {
+    displayValues.push({
+      key: REST_TAG_KEY,
+      label: typeof maxTagPlaceholder === 'function' ? maxTagPlaceholder(values.slice(maxTagCount)) : maxTagPlaceholder
+    });
+  }
+  var selectionNode = /*#__PURE__*/React.createElement(CSSMotionList, {
+    component: false,
+    keys: displayValues,
+    motionName: choiceTransitionName,
+    motionAppear: motionAppear
+  }, function (_ref2) {
+    var key = _ref2.key,
+      label = _ref2.label,
+      value = _ref2.value,
+      itemDisabled = _ref2.disabled,
+      className = _ref2.className,
+      style = _ref2.style;
+    var mergedKey = key || value;
+    var closable = !disabled && key !== REST_TAG_KEY && !itemDisabled;
+    var onMouseDown = function onMouseDown(event) {
+      event.preventDefault();
+      event.stopPropagation();
     };
-    return typeof tagRender === 'function' ? customizeRenderSelector(value, displayLabel, itemDisabled, closable, onClose) : defaultRenderSelector(valueItem, displayLabel, itemDisabled, closable, onClose);
-  };
-  var renderRest = function renderRest(omittedValues) {
-    var content = typeof maxTagPlaceholder === 'function' ? maxTagPlaceholder(omittedValues) : maxTagPlaceholder;
-    return typeof tagRender === 'function' ? customizeRenderSelector(undefined, content, false, false, undefined, true) : defaultRenderSelector({
-      title: content
-    }, content, false);
-  };
-
-  // >>> Input Node
-  var inputNode = /*#__PURE__*/React.createElement("div", {
-    className: "".concat(selectionPrefixCls, "-search"),
+    var onClose = function onClose(event) {
+      if (event) event.stopPropagation();
+      onSelect(value, {
+        selected: false
+      });
+    };
+    return typeof tagRender === 'function' ? ( /*#__PURE__*/React.createElement("span", {
+      key: mergedKey,
+      onMouseDown: onMouseDown,
+      className: className,
+      style: style
+    }, tagRender({
+      label: label,
+      value: value,
+      disabled: itemDisabled,
+      closable: closable,
+      onClose: onClose
+    }))) : ( /*#__PURE__*/React.createElement("span", {
+      key: mergedKey,
+      className: classNames(className, "".concat(prefixCls, "-selection-item"), _defineProperty({}, "".concat(prefixCls, "-selection-item-disabled"), itemDisabled)),
+      style: style
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "".concat(prefixCls, "-selection-item-content")
+    }, label), closable && ( /*#__PURE__*/React.createElement(TransBtn, {
+      className: "".concat(prefixCls, "-selection-item-remove"),
+      onMouseDown: onMouseDown,
+      onClick: onClose,
+      customizeIcon: removeIcon
+    }, "\xD7"))));
+  });
+  return /*#__PURE__*/React.createElement(React.Fragment, null, selectionNode, /*#__PURE__*/React.createElement("span", {
+    className: "".concat(prefixCls, "-selection-search"),
     style: {
       width: inputWidth
-    },
-    onFocus: function onFocus() {
-      setFocused(true);
-    },
-    onBlur: function onBlur() {
-      setFocused(false);
     }
   }, /*#__PURE__*/React.createElement(Input, {
     ref: inputRef,
@@ -151,7 +157,7 @@ var SelectSelector = function SelectSelector(props) {
     autoFocus: autoFocus,
     autoComplete: autoComplete,
     editable: inputEditable,
-    activeDescendantId: activeDescendantId,
+    accessibilityIndex: accessibilityIndex,
     value: inputValue,
     onKeyDown: onInputKeyDown,
     onMouseDown: onInputMouseDown,
@@ -163,22 +169,10 @@ var SelectSelector = function SelectSelector(props) {
     attrs: pickAttrs(props, true)
   }), /*#__PURE__*/React.createElement("span", {
     ref: measureRef,
-    className: "".concat(selectionPrefixCls, "-search-mirror"),
+    className: "".concat(prefixCls, "-selection-search-mirror"),
     "aria-hidden": true
-  }, inputValue, "\xA0"));
-
-  // >>> Selections
-  var selectionNode = /*#__PURE__*/React.createElement(Overflow, {
-    prefixCls: "".concat(selectionPrefixCls, "-overflow"),
-    data: values,
-    renderItem: renderItem,
-    renderRest: renderRest,
-    suffix: inputNode,
-    itemKey: itemKey,
-    maxCount: maxTagCount
-  });
-  return /*#__PURE__*/React.createElement(React.Fragment, null, selectionNode, !values.length && !inputValue && /*#__PURE__*/React.createElement("span", {
-    className: "".concat(selectionPrefixCls, "-placeholder")
-  }, placeholder));
+  }, inputValue, "\xA0")), !values.length && !inputValue && ( /*#__PURE__*/React.createElement("span", {
+    className: "".concat(prefixCls, "-selection-placeholder")
+  }, placeholder)));
 };
 export default SelectSelector;

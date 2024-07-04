@@ -1,7 +1,10 @@
-import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
+import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
 import _toArray from "@babel/runtime/helpers/esm/toArray";
+import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
+import _typeof from "@babel/runtime/helpers/esm/typeof";
 import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
 import warning from "rc-util/es/warning";
+import { toArray } from './commonUtil';
 function getKey(data, index) {
   var key = data.key;
   var value;
@@ -16,80 +19,40 @@ function getKey(data, index) {
   }
   return "rc-index-key-".concat(index);
 }
-export function isValidCount(value) {
-  return typeof value !== 'undefined' && !Number.isNaN(value);
-}
-export function fillFieldNames(fieldNames, childrenAsData) {
-  var _ref = fieldNames || {},
-    label = _ref.label,
-    value = _ref.value,
-    options = _ref.options,
-    groupLabel = _ref.groupLabel;
-  var mergedLabel = label || (childrenAsData ? 'children' : 'label');
-  return {
-    label: mergedLabel,
-    value: value || 'value',
-    options: options || 'options',
-    groupLabel: groupLabel || mergedLabel
-  };
-}
-
 /**
  * Flat options into flatten list.
  * We use `optionOnly` here is aim to avoid user use nested option group.
  * Here is simply set `key` to the index if not provided.
  */
 export function flattenOptions(options) {
-  var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-    fieldNames = _ref2.fieldNames,
-    childrenAsData = _ref2.childrenAsData;
   var flattenList = [];
-  var _fillFieldNames = fillFieldNames(fieldNames, false),
-    fieldLabel = _fillFieldNames.label,
-    fieldValue = _fillFieldNames.value,
-    fieldOptions = _fillFieldNames.options,
-    groupLabel = _fillFieldNames.groupLabel;
   function dig(list, isGroupOption) {
-    if (!Array.isArray(list)) {
-      return;
-    }
     list.forEach(function (data) {
-      if (isGroupOption || !(fieldOptions in data)) {
-        var value = data[fieldValue];
-
+      if (isGroupOption || !('options' in data)) {
         // Option
         flattenList.push({
           key: getKey(data, flattenList.length),
           groupOption: isGroupOption,
-          data: data,
-          label: data[fieldLabel],
-          value: value
+          data: data
         });
       } else {
-        var grpLabel = data[groupLabel];
-        if (grpLabel === undefined && childrenAsData) {
-          grpLabel = data.label;
-        }
-
         // Option Group
         flattenList.push({
           key: getKey(data, flattenList.length),
           group: true,
-          data: data,
-          label: grpLabel
+          data: data
         });
-        dig(data[fieldOptions], true);
+        dig(data.options, true);
       }
     });
   }
   dig(options, false);
   return flattenList;
 }
-
 /**
  * Inject `props` into `option` for legacy usage
  */
-export function injectPropsWithOption(option) {
+function injectPropsWithOption(option) {
   var newOption = _objectSpread({}, option);
   if (!('props' in newOption)) {
     Object.defineProperty(newOption, 'props', {
@@ -101,15 +64,129 @@ export function injectPropsWithOption(option) {
   }
   return newOption;
 }
-export var getSeparatedContent = function getSeparatedContent(text, tokens, end) {
+export function findValueOption(values, options) {
+  var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+    _ref$prevValueOptions = _ref.prevValueOptions,
+    prevValueOptions = _ref$prevValueOptions === void 0 ? [] : _ref$prevValueOptions;
+  var optionMap = new Map();
+  options.forEach(function (flattenItem) {
+    if (!flattenItem.group) {
+      var data = flattenItem.data;
+      // Check if match
+      optionMap.set(data.value, data);
+    }
+  });
+  return values.map(function (val) {
+    var option = optionMap.get(val);
+    // Fallback to try to find prev options
+    if (!option) {
+      option = _objectSpread({}, prevValueOptions.find(function (opt) {
+        return opt._INTERNAL_OPTION_VALUE_ === val;
+      }));
+    }
+    return injectPropsWithOption(option);
+  });
+}
+export var getLabeledValue = function getLabeledValue(value, _ref2) {
+  var options = _ref2.options,
+    prevValue = _ref2.prevValue,
+    labelInValue = _ref2.labelInValue,
+    optionLabelProp = _ref2.optionLabelProp;
+  var item = findValueOption([value], options)[0];
+  var result = {
+    value: value
+  };
+  var prevValItem;
+  var prevValues = toArray(prevValue);
+  if (labelInValue) {
+    prevValItem = prevValues.find(function (prevItem) {
+      if (_typeof(prevItem) === 'object' && 'value' in prevItem) {
+        return prevItem.value === value;
+      }
+      // [Legacy] Support `key` as `value`
+      return prevItem.key === value;
+    });
+  }
+  if (prevValItem && _typeof(prevValItem) === 'object' && 'label' in prevValItem) {
+    result.label = prevValItem.label;
+    if (item && typeof prevValItem.label === 'string' && typeof item[optionLabelProp] === 'string' && prevValItem.label.trim() !== item[optionLabelProp].trim()) {
+      warning(false, '`label` of `value` is not same as `label` in Select options.');
+    }
+  } else if (item && optionLabelProp in item) {
+    result.label = item[optionLabelProp];
+  } else {
+    result.label = value;
+  }
+  // Used for motion control
+  result.key = result.value;
+  return result;
+};
+function toRawString(content) {
+  return toArray(content).join('');
+}
+/** Filter single option if match the search text */
+function getFilterFunction(optionFilterProp) {
+  return function (searchValue, option) {
+    var lowerSearchText = searchValue.toLowerCase();
+    // Group label search
+    if ('options' in option) {
+      return toRawString(option.label).toLowerCase().includes(lowerSearchText);
+    }
+    // Option value search
+    var rawValue = option[optionFilterProp];
+    var value = toRawString(rawValue).toLowerCase();
+    return value.includes(lowerSearchText);
+  };
+}
+/** Filter options and return a new options by the search text */
+export function filterOptions(searchValue, options, _ref3) {
+  var optionFilterProp = _ref3.optionFilterProp,
+    filterOption = _ref3.filterOption;
+  var filteredOptions = [];
+  var filterFunc;
+  if (filterOption === false) {
+    return _toConsumableArray(options);
+  }
+  if (typeof filterOption === 'function') {
+    filterFunc = filterOption;
+  } else {
+    filterFunc = getFilterFunction(optionFilterProp);
+  }
+  options.forEach(function (item) {
+    // Group should check child options
+    if ('options' in item) {
+      // Check group first
+      var matchGroup = filterFunc(searchValue, item);
+      if (matchGroup) {
+        filteredOptions.push(item);
+      } else {
+        // Check option
+        var subOptions = item.options.filter(function (subItem) {
+          return filterFunc(searchValue, subItem);
+        });
+        if (subOptions.length) {
+          filteredOptions.push(_objectSpread(_objectSpread({}, item), {}, {
+            options: subOptions
+          }));
+        }
+      }
+      return;
+    }
+    if (filterFunc(searchValue, injectPropsWithOption(item))) {
+      filteredOptions.push(item);
+    }
+  });
+  return filteredOptions;
+}
+export function getSeparatedContent(text, tokens) {
   if (!tokens || !tokens.length) {
     return null;
   }
   var match = false;
-  var separate = function separate(str, _ref3) {
-    var _ref4 = _toArray(_ref3),
-      token = _ref4[0],
-      restTokens = _ref4.slice(1);
+  function separate(str, _ref4) {
+    var _ref5 = _toArray(_ref4),
+      token = _ref5[0],
+      restTokens = _ref5.slice(1);
     if (!token) {
       return [str];
     }
@@ -117,12 +194,42 @@ export var getSeparatedContent = function getSeparatedContent(text, tokens, end)
     match = match || list.length > 1;
     return list.reduce(function (prevList, unitStr) {
       return [].concat(_toConsumableArray(prevList), _toConsumableArray(separate(unitStr, restTokens)));
-    }, []).filter(Boolean);
-  };
-  var list = separate(text, tokens);
-  if (match) {
-    return typeof end !== 'undefined' ? list.slice(0, end) : list;
-  } else {
-    return null;
+    }, []).filter(function (unit) {
+      return unit;
+    });
   }
-};
+  var list = separate(text, tokens);
+  return match ? list : null;
+}
+export function isValueDisabled(value, options) {
+  var option = findValueOption([value], options)[0];
+  return option.disabled;
+}
+/**
+ * `tags` mode should fill un-list item into the option list
+ */
+export function fillOptionsWithMissingValue(options, value, optionLabelProp, labelInValue) {
+  var values = toArray(value).slice().sort();
+  var cloneOptions = _toConsumableArray(options);
+  // Convert options value to set
+  var optionValues = new Set();
+  options.forEach(function (opt) {
+    if (opt.options) {
+      opt.options.forEach(function (subOpt) {
+        optionValues.add(subOpt.value);
+      });
+    } else {
+      optionValues.add(opt.value);
+    }
+  });
+  // Fill missing value
+  values.forEach(function (item) {
+    var val = labelInValue ? item.value : item;
+    if (!optionValues.has(val)) {
+      cloneOptions.push(labelInValue ? _defineProperty(_defineProperty({}, optionLabelProp, item.label), "value", val) : {
+        value: val
+      });
+    }
+  });
+  return cloneOptions;
+}

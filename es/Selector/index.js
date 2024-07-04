@@ -1,4 +1,3 @@
-import _extends from "@babel/runtime/helpers/esm/extends";
 import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
 /**
  * Cursor rule:
@@ -9,42 +8,37 @@ import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
  * Accessibility:
  * - https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.1pattern/listbox-combo.html
  */
-
-import KeyCode from "rc-util/es/KeyCode";
 import * as React from 'react';
 import { useRef } from 'react';
-import useLock from "../hooks/useLock";
-import { isValidateOpenKey } from "../utils/keyUtil";
-import MultipleSelector from "./MultipleSelector";
-import SingleSelector from "./SingleSelector";
+import KeyCode from "rc-util/es/KeyCode";
+import MultipleSelector from './MultipleSelector';
+import SingleSelector from './SingleSelector';
+import useLock from '../hooks/useLock';
 var Selector = function Selector(props, ref) {
   var inputRef = useRef(null);
   var compositionStatusRef = useRef(false);
   var prefixCls = props.prefixCls,
+    multiple = props.multiple,
     open = props.open,
     mode = props.mode,
     showSearch = props.showSearch,
     tokenWithEnter = props.tokenWithEnter,
-    disabled = props.disabled,
-    autoClearSearchValue = props.autoClearSearchValue,
     onSearch = props.onSearch,
     onSearchSubmit = props.onSearchSubmit,
     onToggleOpen = props.onToggleOpen,
     onInputKeyDown = props.onInputKeyDown,
     domRef = props.domRef;
-
   // ======================= Ref =======================
   React.useImperativeHandle(ref, function () {
     return {
-      focus: function focus(options) {
-        inputRef.current.focus(options);
+      focus: function focus() {
+        inputRef.current.focus();
       },
       blur: function blur() {
         inputRef.current.blur();
       }
     };
   });
-
   // ====================== Input ======================
   var _useLock = useLock(0),
     _useLock2 = _slicedToArray(_useLock, 2),
@@ -61,13 +55,12 @@ var Selector = function Selector(props, ref) {
     if (which === KeyCode.ENTER && mode === 'tags' && !compositionStatusRef.current && !open) {
       // When menu isn't open, OptionList won't trigger a value change
       // So when enter is pressed, the tag's input value should be emitted here to let selector know
-      onSearchSubmit === null || onSearchSubmit === void 0 || onSearchSubmit(event.target.value);
+      onSearchSubmit(event.target.value);
     }
-    if (isValidateOpenKey(which)) {
+    if (![KeyCode.SHIFT, KeyCode.TAB, KeyCode.BACKSPACE, KeyCode.ESC].includes(which)) {
       onToggleOpen(true);
     }
   };
-
   /**
    * We can not use `findDOMNode` sine it will get warning,
    * have to use timer to check if is input element.
@@ -75,7 +68,6 @@ var Selector = function Selector(props, ref) {
   var onInternalInputMouseDown = function onInternalInputMouseDown() {
     setInputMouseDown(true);
   };
-
   // When paste come, ignore next onChange
   var pastedTextRef = useRef(null);
   var triggerOnSearch = function triggerOnSearch(value) {
@@ -86,21 +78,15 @@ var Selector = function Selector(props, ref) {
   var onInputCompositionStart = function onInputCompositionStart() {
     compositionStatusRef.current = true;
   };
-  var onInputCompositionEnd = function onInputCompositionEnd(e) {
+  var onInputCompositionEnd = function onInputCompositionEnd() {
     compositionStatusRef.current = false;
-
-    // Trigger search again to support `tokenSeparators` with typewriting
-    if (mode !== 'combobox') {
-      triggerOnSearch(e.target.value);
-    }
   };
   var onInputChange = function onInputChange(event) {
     var value = event.target.value;
-
     // Pasted text should replace back to origin content
     if (tokenWithEnter && pastedTextRef.current && /[\r\n]/.test(pastedTextRef.current)) {
       // CRLF will be treated as a single space for input element
-      var replacedText = pastedTextRef.current.replace(/[\r\n]+$/, '').replace(/\r\n/g, ' ').replace(/[\r\n]/g, ' ');
+      var replacedText = pastedTextRef.current.replace(/\r\n/g, ' ').replace(/[\r\n]/g, ' ');
       value = value.replace(replacedText, pastedTextRef.current);
     }
     pastedTextRef.current = null;
@@ -108,8 +94,8 @@ var Selector = function Selector(props, ref) {
   };
   var onInputPaste = function onInputPaste(e) {
     var clipboardData = e.clipboardData;
-    var value = clipboardData === null || clipboardData === void 0 ? void 0 : clipboardData.getData('text');
-    pastedTextRef.current = value || '';
+    var value = clipboardData.getData('text');
+    pastedTextRef.current = value;
   };
   var onClick = function onClick(_ref) {
     var target = _ref.target;
@@ -127,21 +113,16 @@ var Selector = function Selector(props, ref) {
   };
   var onMouseDown = function onMouseDown(event) {
     var inputMouseDown = getInputMouseDown();
-
-    // when mode is combobox and it is disabled, don't prevent default behavior
-    // https://github.com/ant-design/ant-design/issues/37320
-    // https://github.com/ant-design/ant-design/issues/48281
-    if (event.target !== inputRef.current && !inputMouseDown && !(mode === 'combobox' && disabled)) {
+    if (event.target !== inputRef.current && !inputMouseDown) {
       event.preventDefault();
     }
     if (mode !== 'combobox' && (!showSearch || !inputMouseDown) || !open) {
-      if (open && autoClearSearchValue !== false) {
+      if (open) {
         onSearch('', true, false);
       }
       onToggleOpen();
     }
   };
-
   // ================= Inner Selector ==================
   var sharedProps = {
     inputRef: inputRef,
@@ -152,7 +133,7 @@ var Selector = function Selector(props, ref) {
     onInputCompositionStart: onInputCompositionStart,
     onInputCompositionEnd: onInputCompositionEnd
   };
-  var selectNode = mode === 'multiple' || mode === 'tags' ? /*#__PURE__*/React.createElement(MultipleSelector, _extends({}, props, sharedProps)) : /*#__PURE__*/React.createElement(SingleSelector, _extends({}, props, sharedProps));
+  var selectNode = multiple ? ( /*#__PURE__*/React.createElement(MultipleSelector, Object.assign({}, props, sharedProps))) : ( /*#__PURE__*/React.createElement(SingleSelector, Object.assign({}, props, sharedProps)));
   return /*#__PURE__*/React.createElement("div", {
     ref: domRef,
     className: "".concat(prefixCls, "-selector"),
@@ -161,7 +142,5 @@ var Selector = function Selector(props, ref) {
   }, selectNode);
 };
 var ForwardSelector = /*#__PURE__*/React.forwardRef(Selector);
-if (process.env.NODE_ENV !== 'production') {
-  ForwardSelector.displayName = 'Selector';
-}
+ForwardSelector.displayName = 'Selector';
 export default ForwardSelector;
