@@ -118,7 +118,7 @@ var SelectSelector = function SelectSelector(props) {
         selected: false
       });
     };
-    return typeof tagRender === 'function' ? ( /*#__PURE__*/React.createElement("span", {
+    return typeof tagRender === 'function' ? (/*#__PURE__*/React.createElement("span", {
       key: mergedKey,
       onMouseDown: onMouseDown,
       className: className,
@@ -129,13 +129,13 @@ var SelectSelector = function SelectSelector(props) {
       disabled: itemDisabled,
       closable: closable,
       onClose: onClose
-    }))) : ( /*#__PURE__*/React.createElement("span", {
+    }))) : (/*#__PURE__*/React.createElement("span", {
       key: mergedKey,
       className: classNames(className, "".concat(prefixCls, "-selection-item"), _defineProperty({}, "".concat(prefixCls, "-selection-item-disabled"), itemDisabled)),
       style: style
     }, /*#__PURE__*/React.createElement("span", {
       className: "".concat(prefixCls, "-selection-item-content")
-    }, label), closable && ( /*#__PURE__*/React.createElement(TransBtn, {
+    }, label), closable && (/*#__PURE__*/React.createElement(TransBtn, {
       className: "".concat(prefixCls, "-selection-item-remove"),
       onMouseDown: onMouseDown,
       onClick: onClose,
@@ -171,7 +171,7 @@ var SelectSelector = function SelectSelector(props) {
     ref: measureRef,
     className: "".concat(prefixCls, "-selection-search-mirror"),
     "aria-hidden": true
-  }, inputValue, "\xA0")), !values.length && !inputValue && ( /*#__PURE__*/React.createElement("span", {
+  }, inputValue, "\xA0")), !values.length && !inputValue && (/*#__PURE__*/React.createElement("span", {
     className: "".concat(prefixCls, "-selection-placeholder")
   }, placeholder)));
 };

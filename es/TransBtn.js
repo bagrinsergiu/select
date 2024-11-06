@@ -28,7 +28,7 @@ var TransBtn = function TransBtn(_ref) {
     unselectable: "on",
     onClick: onClick,
     "aria-hidden": true
-  }, icon !== undefined ? icon : ( /*#__PURE__*/React.createElement("span", {
+  }, icon !== undefined ? icon : (/*#__PURE__*/React.createElement("span", {
     className: classNames(className.split(/\s+/).map(function (cls) {
       return "".concat(cls, "-icon");
     }))

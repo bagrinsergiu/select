@@ -133,7 +133,7 @@ var Selector = function Selector(props, ref) {
     onInputCompositionStart: onInputCompositionStart,
     onInputCompositionEnd: onInputCompositionEnd
   };
-  var selectNode = multiple ? ( /*#__PURE__*/React.createElement(MultipleSelector, Object.assign({}, props, sharedProps))) : ( /*#__PURE__*/React.createElement(SingleSelector, Object.assign({}, props, sharedProps)));
+  var selectNode = multiple ? (/*#__PURE__*/React.createElement(MultipleSelector, Object.assign({}, props, sharedProps))) : (/*#__PURE__*/React.createElement(SingleSelector, Object.assign({}, props, sharedProps)));
   return /*#__PURE__*/React.createElement("div", {
     ref: domRef,
     className: "".concat(prefixCls, "-selector"),

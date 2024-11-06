@@ -696,7 +696,7 @@ export default function generateSelector(config) {
       onKeyUp: onInternalKeyUp,
       onFocus: onContainerFocus,
       onBlur: onContainerBlur
-    }), mockFocused && !mergedOpen && ( /*#__PURE__*/React.createElement("span", {
+    }), mockFocused && !mergedOpen && (/*#__PURE__*/React.createElement("span", {
       style: {
         width: 0,
         height: 0,

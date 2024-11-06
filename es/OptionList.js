@@ -193,7 +193,7 @@ var OptionList = function OptionList(_ref, ref) {
       children = itemData.children;
     var attrs = pickAttrs(itemData, true);
     var mergedLabel = childrenAsData ? children : label;
-    return item ? ( /*#__PURE__*/React.createElement("div", Object.assign({
+    return item ? (/*#__PURE__*/React.createElement("div", Object.assign({
       "aria-label": typeof mergedLabel === 'string' ? mergedLabel : null
     }, attrs, {
       key: index,
@@ -270,7 +270,7 @@ var OptionList = function OptionList(_ref, ref) {
       style: style
     }), /*#__PURE__*/React.createElement("div", {
       className: "".concat(optionPrefixCls, "-content")
-    }, content), /*#__PURE__*/React.isValidElement(menuItemSelectedIcon) || selected, iconVisible && ( /*#__PURE__*/React.createElement(TransBtn, {
+    }, content), /*#__PURE__*/React.isValidElement(menuItemSelectedIcon) || selected, iconVisible && (/*#__PURE__*/React.createElement(TransBtn, {
       className: "".concat(itemPrefixCls, "-option-state"),
       customizeIcon: menuItemSelectedIcon,
       customizeIconProps: {

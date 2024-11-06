@@ -48,8 +48,8 @@
     "rc-motion": "^2.0.1",
     "rc-trigger": "^5.0.4",
     "rc-util": "^5.0.1",
-    "warning": "^4.0.3",
-    "rc-virtual-list": "github:bagrinsergiu/virtual-list#remove_builded_folders_from_git_ignore_to_can_install_fork_locally"
+    "rc-virtual-list": "https://github.com/bagrinsergiu/virtual-list/archive/refs/heads/try-to_remove_all_unneded_files_to_make_shortest_instalation_time.tar.gz",
+    "warning": "^4.0.3"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.5",

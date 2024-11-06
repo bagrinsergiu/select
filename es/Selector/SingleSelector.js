@@ -69,10 +69,10 @@ var SingleSelector = function SingleSelector(props) {
     onCompositionEnd: onInputCompositionEnd,
     tabIndex: tabIndex,
     attrs: pickAttrs(props, true)
-  })), !combobox && item && !hasTextInput && ( /*#__PURE__*/React.createElement("span", {
+  })), !combobox && item && !hasTextInput && (/*#__PURE__*/React.createElement("span", {
     className: "".concat(prefixCls, "-selection-item"),
     title: title
-  }, item.label)), !item && !hasTextInput && ( /*#__PURE__*/React.createElement("span", {
+  }, item.label)), !item && !hasTextInput && (/*#__PURE__*/React.createElement("span", {
     className: "".concat(prefixCls, "-selection-placeholder")
   }, placeholder)));
 };
